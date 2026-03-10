@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Кабинет репетитора — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Кабинет репетитора</h1>
+  <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{{ profile.full_name }}</p>
+
+  <div class="dashboard-grid">
+    <div>
+      <div class="dashboard-section card">
+        <h2>Предстоящие уроки</h2>
+        {% if upcoming %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Ученик</th><th>Дата и время</th><th>Статус</th><th>Действия</th></tr>
+            </thead>
+            <tbody>
+              {% for b in upcoming %}
+              <tr>
+                <td>{{ b.student.full_name if b.student else '—' }}</td>
+                <td>{{ b.slot.date.strftime('%d.%m.%Y') }} {{ b.slot.start_time.strftime('%H:%M') }}</td>
+                <td>{{ b.status }}</td>
+                <td>
+                  {% if b.status == 'pending' %}
+                  <form action="{{ url_for('tutor.confirm_booking', booking_id=b.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-success btn-small">Подтвердить</button>
+                  </form>
+                  <form action="{{ url_for('tutor.decline_booking', booking_id=b.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-small">Отклонить</button>
+                  </form>
+                  {% endif %}
+                  {% if b.status == 'confirmed' %}
+                  <form action="{{ url_for('tutor.complete_booking', booking_id=b.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-small">Завершить урок</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p style="color: var(--text-secondary);">Нет предстоящих уроков.</p>
+        {% endif %}
+      </div>
+
+      <div class="dashboard-section card">
+        <h2>Последние отзывы</h2>
+        {% for r in reviews %}
+        <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+          <span class="rating">★ {{ r.rating }}</span>
+          <p style="margin-top: 0.25rem;">{{ r.review_text }}</p>
+        </div>
+        {% else %}
+        <p style="color: var(--text-secondary);">Пока нет отзывов.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div>
+      <div class="dashboard-section card">
+        <h2>Заработок</h2>
+        <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">{{ "%.0f"|format(total_earnings) }} ₽</p>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">После завершённых уроков</p>
+      </div>
+      <div class="dashboard-section card">
+        <a href="{{ url_for('tutor.slots') }}" class="btn btn-primary" style="width: 100%;">Управление слотами</a>
+      </div>
+      <div class="dashboard-section card">
+        <a href="{{ url_for('tutor.profile') }}" class="btn btn-secondary" style="width: 100%;">Редактировать профиль</a>
+      </div>
+      <div class="dashboard-section card">
+        <a href="{{ url_for('chat.index') }}" class="btn btn-secondary" style="width: 100%;">Сообщения</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

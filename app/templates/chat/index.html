@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Сообщения — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Сообщения</h1>
+  <div class="card" style="max-width: 400px;">
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Выберите собеседника или начните переписку со страницы репетитора (кнопка «Написать»).</p>
+    {% if partners %}
+    <ul style="list-style: none;">
+      {% for u in partners %}
+      <li style="border-bottom: 1px solid var(--border);">
+        <a href="{{ url_for('chat.conversation', user_id=u.id) }}" class="chat-item" style="display: block; padding: 1rem;">
+          {{ u.email }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--text-secondary);">Пока нет переписок.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

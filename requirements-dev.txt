@@ -1,0 +1,6 @@
+selenium
+pytest
+PySocks
+trio
+trio-websocket
+outcome

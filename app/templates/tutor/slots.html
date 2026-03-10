@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Слоты — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Управление слотами</h1>
+
+  <div class="card" style="max-width: 400px; margin-bottom: 2rem;">
+    <h2 class="card-title">Добавить слот</h2>
+    <form method="post" action="{{ url_for('tutor.slots') }}">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.date.label }}
+        {{ form.date() }}
+        {% if form.date.errors %}<div class="form-errors">{{ form.date.errors[0] }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        {{ form.start_time.label }}
+        {{ form.start_time() }}
+      </div>
+      <div class="form-group">
+        {{ form.end_time.label }}
+        {{ form.end_time() }}
+      </div>
+      <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Ваши слоты</h2>
+    {% if slots %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Дата</th><th>Время</th><th>Статус</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for slot in slots %}
+          <tr>
+            <td>{{ slot.date.strftime('%d.%m.%Y') }}</td>
+            <td>{{ slot.start_time.strftime('%H:%M') }} – {{ slot.end_time.strftime('%H:%M') }}</td>
+            <td>{{ 'Занят' if slot.is_booked else 'Свободен' }}</td>
+            <td>
+              {% if not slot.is_booked %}
+              <form action="{{ url_for('tutor.delete_slot', slot_id=slot.id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger btn-small">Удалить</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary);">Нет слотов. Добавьте выше.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

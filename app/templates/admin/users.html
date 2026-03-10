@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Пользователи — Админ{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Пользователи</h1>
+  <form method="get" action="{{ url_for('admin.users') }}" class="filters">
+    <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Поиск по email">
+    <button type="submit" class="btn btn-primary">Найти</button>
+  </form>
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Роль</th>
+          <th>Активен</th>
+          <th>Дата</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td>{{ 'Да' if u.is_active else 'Нет' }}</td>
+          <td>{{ u.created_at.strftime('%d.%m.%Y') }}</td>
+          <td>
+            {% if u.id != current_user.id %}
+            <form action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}" method="post" style="display: inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-small btn-secondary">{{ 'Деактивировать' if u.is_active else 'Активировать' }}</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

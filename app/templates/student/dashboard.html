@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Кабинет ученика — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Кабинет ученика</h1>
+  <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">{{ profile.full_name or 'Заполните профиль' }}</p>
+
+  <div class="dashboard-grid">
+    <div>
+      <div class="dashboard-section card">
+        <h2>Ближайшие уроки</h2>
+        {% if upcoming %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Репетитор</th><th>Дата и время</th><th>Статус</th><th>Действия</th></tr>
+            </thead>
+            <tbody>
+              {% for b in upcoming %}
+              <tr>
+                <td><a href="{{ url_for('main.tutor_profile', tutor_id=b.tutor.id) }}">{{ b.tutor.full_name }}</a></td>
+                <td>{{ b.slot.date.strftime('%d.%m.%Y') }} {{ b.slot.start_time.strftime('%H:%M') }}</td>
+                <td>{{ b.status }}</td>
+                <td>
+                  {% if b.status == 'confirmed' %}
+                  <a href="{{ url_for('payments.checkout', booking_id=b.id) }}" class="btn btn-primary btn-small">Оплатить</a>
+                  {% endif %}
+                  {% if b.status in ('pending', 'confirmed') %}
+                  <form action="{{ url_for('student.cancel_booking', booking_id=b.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-small">Отменить</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p style="color: var(--text-secondary);">Нет предстоящих уроков. <a href="{{ url_for('main.tutors') }}">Найти репетитора</a>.</p>
+        {% endif %}
+      </div>
+
+      <div class="dashboard-section card">
+        <h2>История</h2>
+        {% if history %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Репетитор</th><th>Дата</th><th>Статус</th><th></th></tr>
+            </thead>
+            <tbody>
+              {% for b in history %}
+              <tr>
+                <td>{{ b.tutor.full_name }}</td>
+                <td>{{ b.slot.date.strftime('%d.%m.%Y') }}</td>
+                <td>{{ b.status }}</td>
+                <td>
+                  {% if b.status == 'completed' and (not b.lesson or not b.lesson.review_text) %}
+                  <a href="{{ url_for('student.leave_review', booking_id=b.id) }}" class="btn btn-secondary btn-small">Оставить отзыв</a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p style="color: var(--text-secondary);">История пуста.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <div class="dashboard-section card">
+        <h2>Избранные репетиторы</h2>
+        {% if favorites %}
+        <ul style="list-style: none;">
+          {% for t in favorites %}
+          <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <a href="{{ url_for('main.tutor_profile', tutor_id=t.id) }}">{{ t.full_name }}</a>
+            <form action="{{ url_for('student.remove_favorite', tutor_id=t.id) }}" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-small btn-secondary">✕</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p style="color: var(--text-secondary);">Нет избранных. Добавляйте с карточки репетитора.</p>
+        {% endif %}
+      </div>
+      <div class="dashboard-section card">
+        <a href="{{ url_for('chat.index') }}" class="btn btn-primary" style="width: 100%;">Сообщения</a>
+      </div>
+      <div class="dashboard-section card">
+        <a href="{{ url_for('student.profile') }}" class="btn btn-secondary" style="width: 100%;">Редактировать профиль</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

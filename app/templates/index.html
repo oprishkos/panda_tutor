@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Главная — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <section class="hero">
+    <h1>Найдите репетитора для любого предмета</h1>
+    <p>Удобная платформа для учеников и репетиторов. Выбирайте преподавателя, бронируйте уроки и занимайтесь онлайн.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('main.tutors') }}" class="btn btn-primary">Найти репетитора</a>
+      {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Стать репетитором</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Как это работает</h2>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Выберите репетитора</h3>
+        <p>Найдите преподавателя по нужному предмету, посмотрите отзывы и рейтинг.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Забронируйте урок</h3>
+        <p>Выберите удобное время из доступных слотов и отправьте заявку.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Занимайтесь онлайн</h3>
+        <p>После подтверждения оплатите урок и проводите занятие в удобном формате.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Популярные предметы</h2>
+    <div class="subjects-grid">
+      <a href="{{ url_for('main.tutors', q='Математика') }}" class="subject-tag">Математика</a>
+      <a href="{{ url_for('main.tutors', q='Русский язык') }}" class="subject-tag">Русский язык</a>
+      <a href="{{ url_for('main.tutors', q='Английский') }}" class="subject-tag">Английский</a>
+      <a href="{{ url_for('main.tutors', q='Физика') }}" class="subject-tag">Физика</a>
+      <a href="{{ url_for('main.tutors', q='Химия') }}" class="subject-tag">Химия</a>
+      <a href="{{ url_for('main.tutors', q='Программирование') }}" class="subject-tag">Программирование</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Проверенные репетиторы</h2>
+    <div class="tutors-grid">
+      {% for tutor in top_tutors %}
+      <div class="tutor-card">
+        <img src="{{ tutor.photo_url or 'https://via.placeholder.com/280x180?text=Фото' }}" alt="{{ tutor.full_name }}" class="tutor-card-photo">
+        <div class="tutor-card-body">
+          <h3 class="tutor-card-name">{{ tutor.full_name }}{% if tutor.is_verified %} ✓{% endif %}</h3>
+          <p class="tutor-card-subjects">{{ tutor.subjects[:60] }}{% if tutor.subjects|length > 60 %}...{% endif %}</p>
+          <div class="tutor-card-meta">
+            <span class="rating">★ {{ tutor._rating }}</span>
+            <span class="price">{{ tutor.hourly_rate }} ₽/ч</span>
+          </div>
+          <a href="{{ url_for('main.tutor_profile', tutor_id=tutor.id) }}" class="btn btn-primary btn-small" style="margin-top: 0.75rem; width: 100%;">Записаться</a>
+        </div>
+      </div>
+      {% else %}
+      <p style="grid-column: 1/-1; color: var(--text-secondary);">Пока нет верифицированных репетиторов. <a href="{{ url_for('main.tutors') }}">Смотреть всех</a>.</p>
+      {% endfor %}
+    </div>
+    <p style="text-align: center; margin-top: 1rem;">
+      <a href="{{ url_for('main.tutors') }}" class="btn btn-secondary">Все репетиторы</a>
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Отзывы</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <blockquote>Очень удобно подобрать репетитора по предмету и времени. Занимаемся уже полгода — сын подтянул математику.</blockquote>
+        <cite>— Анна, мама ученика</cite>
+      </div>
+      <div class="testimonial">
+        <blockquote>Платформа позволила быстро выйти на стабильный поток учеников. Рекомендую коллегам.</blockquote>
+        <cite>— Дмитрий, репетитор</cite>
+      </div>
+      <div class="testimonial">
+        <blockquote>Понятный интерфейс, всё оплачивается безопасно. Удобно вести переписку с репетитором.</blockquote>
+        <cite>— Елена, студентка</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Частые вопросы</h2>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Как записаться на урок?</summary>
+        <p>Зарегистрируйтесь как ученик, найдите репетитора, выберите свободный слот и нажмите «Забронировать». После подтверждения репетитором можно оплатить урок.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Как стать репетитором?</summary>
+        <p>Зарегистрируйтесь и выберите роль «Репетитор». Заполните профиль: предметы, ставку, описание. Добавьте доступные слоты в календаре.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Можно ли отменить урок?</summary>
+        <p>Да. Ученик может отменить бронирование до начала урока. При отмене после оплаты возможен возврат по правилам платформы.</p>
+      </details>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Админ-панель</h1>
+
+  <div class="dashboard-section card" style="margin-bottom: 2rem;">
+    <h2>Статистика</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ total_users }}</p>
+        <p style="color: var(--text-secondary);">Пользователей</p>
+      </div>
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ total_tutors }}</p>
+        <p style="color: var(--text-secondary);">Репетиторов</p>
+      </div>
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ total_bookings }}</p>
+        <p style="color: var(--text-secondary);">Бронирований</p>
+      </div>
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ total_lessons }}</p>
+        <p style="color: var(--text-secondary);">Проведённых уроков</p>
+      </div>
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ "%.0f"|format(total_revenue) }} ₽</p>
+        <p style="color: var(--text-secondary);">Выручка</p>
+      </div>
+      <div>
+        <p style="font-size: 1.5rem; font-weight: 700;">{{ "%.0f"|format(total_commission) }} ₽</p>
+        <p style="color: var(--text-secondary);">Комиссия платформы</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-section card">
+    <a href="{{ url_for('admin.users') }}" class="btn btn-primary">Пользователи</a>
+    <a href="{{ url_for('admin.bookings') }}" class="btn btn-secondary">Все бронирования</a>
+  </div>
+</div>
+{% endblock %}

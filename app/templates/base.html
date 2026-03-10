@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PandaTutor — платформа репетиторов{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-inner">
+            <a href="{{ url_for('main.index') }}" class="logo">
+                <img src="{{ url_for('static', filename='images/panda-logo.jpg') }}" alt="PandaTutor" class="logo-icon">
+                <span class="logo-text">PandaTutor</span>
+            </a>
+            <nav class="nav">
+                <a href="{{ url_for('main.index') }}">Главная</a>
+                <a href="{{ url_for('main.tutors') }}">Репетиторы</a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_student %}
+                    <a href="{{ url_for('student.dashboard') }}">Кабинет</a>
+                    {% elif current_user.is_tutor %}
+                    <a href="{{ url_for('tutor.dashboard') }}">Кабинет</a>
+                    {% elif current_user.is_admin %}
+                    <a href="{{ url_for('admin.index') }}">Админ</a>
+                    {% endif %}
+                    <a href="{{ url_for('chat.index') }}">Сообщения</a>
+                    <a href="{{ url_for('auth.logout') }}">Выйти</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Войти</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Регистрация</a>
+                {% endif %}
+            </nav>
+            <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему"></button>
+            <button class="nav-toggle" id="navToggle" aria-label="Меню"></button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div id="toast-container"></div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 PandaTutor. Платформа онлайн-репетиторства.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

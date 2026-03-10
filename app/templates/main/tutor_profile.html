@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ tutor.full_name }} — PandaTutor{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="profile-header card">
+    <img src="{{ tutor.photo_url or 'https://via.placeholder.com/120?text=Фото' }}" alt="{{ tutor.full_name }}" class="profile-avatar">
+    <div class="profile-info" style="flex: 1;">
+      <h1>{{ tutor.full_name }}{% if tutor.is_verified %} <span class="badge badge-verified">✓ Проверен</span>{% endif %}</h1>
+      <p class="tutor-card-subjects"><strong>Предметы:</strong> {{ tutor.subjects }}</p>
+      {% if tutor.experience %}<p><strong>Опыт:</strong> {{ tutor.experience }}</p>{% endif %}
+      <p><span class="rating">★ {{ tutor._rating }}</span> · <span class="price">{{ tutor.hourly_rate }} ₽/ч</span></p>
+      {% if current_user.is_authenticated and current_user.is_student %}
+      <form action="{{ url_for('student.add_favorite', tutor_id=tutor.id) }}" method="post" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-secondary btn-small">В избранное</button>
+      </form>
+      <a href="{{ url_for('chat.conversation', user_id=tutor.user_id) }}" class="btn btn-primary btn-small">Написать</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if tutor.bio %}
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h2 class="card-title">О себе</h2>
+    <p>{{ tutor.bio }}</p>
+  </div>
+  {% endif %}
+
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h2 class="card-title">Доступные слоты</h2>
+    {% if available_slots %}
+    <div class="slots-grid">
+      {% for slot in available_slots %}
+      <form action="{{ url_for('student.book_lesson', tutor_id=tutor.id, slot_id=slot.id) }}" method="post" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="slot-btn">{{ slot.date.strftime('%d.%m') }} {{ slot.start_time.strftime('%H:%M') }}–{{ slot.end_time.strftime('%H:%M') }}</button>
+      </form>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary);">Нет свободных слотов. Напишите репетитору или зайдите позже.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Отзывы</h2>
+    {% for review in reviews %}
+    <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+      <span class="rating">★ {{ review.rating }}</span>
+      <p style="margin-top: 0.25rem;">{{ review.review_text }}</p>
+      <small style="color: var(--text-secondary);">{{ review.created_at.strftime('%d.%m.%Y') }}</small>
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary);">Пока нет отзывов.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
